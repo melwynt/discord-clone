@@ -4,16 +4,8 @@ import * as Icons from '../../../../components/icons';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 
-export default function Server() {
-  let router = useRouter();
+const Server = ({ server, channel }) => {
   let [closedCategories, setClosedCategories] = useState([]);
-
-  let server = data.find((server) => +server.id === +router.query.sid);
-
-  let channel = server.categories
-    .map((c) => c.channels)
-    .flat()
-    .find((channel) => +channel.id === +router.query.cid);
 
   const toggleCategory = (categoryId) => {
     setClosedCategories((closedCategories) =>
@@ -145,7 +137,9 @@ export default function Server() {
       </div>
     </>
   );
-}
+};
+
+export default Server;
 
 const ChannelLink = ({ channel }) => {
   let Icon = channel.icon ? Icons[channel.icon] : Icons.Hashtag;
@@ -213,4 +207,23 @@ const Message = ({ message }) => {
       <p className="text-gray-100 pl-14">{message.text}</p>
     </div>
   );
+};
+
+export const getServerSideProps = async ({ params }) => {
+  // const router = useRouter();
+  // const server = data.find((server) => +server.id === +router.query.sid);
+  const server = data.find((server) => +server.id === +params.sid);
+
+  const channel = server.categories
+    .map((c) => c.channels)
+    .flat()
+    .find((channel) => +channel.id === +params.cid);
+  // .find((channel) => +channel.id === +router.query.cid);
+
+  return {
+    props: {
+      server,
+      channel,
+    },
+  };
 };
